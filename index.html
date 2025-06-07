@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Daftar Movie Link Terbaru</title> <meta name="description" content="Temukan koleksi lengkap link film terbaru & terpopuler di sini. Nonton film favorit Anda dengan mudah, cepat, dan tanpa ribet. Tersedia berbagai genre!">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Definisi Variabel Warna */
+        :root {
+            --color-scheme-bg: #0A7F51; /* Hijau Gelap */
+            --color-scheme-bg2: #005a64; /* Biru Kehijauan Gelap */
+            --color-scheme-bg-darker: #076441; /* Hijau lebih gelap untuk hover */
+            --color-scheme-bg2-darker: #004750; /* Biru kehijauan lebih gelap untuk hover */
+            --color-scheme-light-tint: rgba(10, 127, 81, 0.05); /* Tint hijau sangat ringan */
+
+            /* Variabel untuk iklan (jika ingin dikustomisasi) */
+            --ad-bg: rgba(255, 255, 255, 0); /* Latar belakang iklan, benar-benar transparan */
+            --border: rgba(0, 0, 0, 0.1); /* Warna border iklan, abu-abu tipis */
+        }
+
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0; /* Padding-top dan padding-bottom akan diatur dinamis oleh JS untuk sticky header */
+            background: linear-gradient(to right bottom, var(--color-scheme-bg), var(--color-scheme-bg2));
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .main-content-section { /* Mengganti .container */
+            background-color: #F8FFFB; /* Warna putih sangat terang dengan sentuhan hijau muda */
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 90, 100, 0.15);
+            padding: 40px;
+            max-width: 1000px;
+            width: 90%;
+            box-sizing: border-box;
+            margin: 0 auto; /* Margin-top default, akan disesuaikan oleh JS jika header sticky */
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 10; /* Kontainer utama di lapisan lebih tinggi */
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Link List (CSS Grid for responsivity) */
+        .link-list-grid { /* Mengganti .movie-list */
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .link-item { /* Mengganti .movie-item */
+            background-color: #fcfcfc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        .link-item:hover { /* Mengganti .movie-item:hover */
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Styling untuk link yang sudah ditonton */
+        .link-item.watched { /* Mengganti .movie-item.watched */
+            background-color: #e0e0e0;
+            opacity: 0.8;
+            border-left: 5px solid var(--color-scheme-bg);
+        }
+        .link-item.watched .actual-link { /* Mengganti .movie-item.watched .movie-link */
+            color: #555;
+            font-weight: 300;
+            text-decoration: line-through;
+        }
+
+        /* Link dalam movie item */
+        .actual-link { /* Mengganti .movie-link */
+            text-decoration: none;
+            color: #0070f3;
+            font-size: 1em;
+            word-break: break-all;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            display: block;
+            width: 100%;
+            padding: 0;
+            transition: color 0.2s ease;
+            text-align: left;
+            font-weight: 600;
+        }
+        .actual-link:hover { /* Mengganti .movie-link:hover */
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* --- STYLES UNTUK MAIN HEADER (AWALNYA TIDAK FIXED) --- */
+        .main-header {
+            width: 100%;
+            height: 60px; /* Tinggi header desktop */
+            background-color: var(--color-scheme-bg);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8em;
+            font-weight: 600;
+            box-sizing: border-box;
+            transition: all 0.3s ease-in-out; /* Transisi untuk efek sticky */
+        }
+
+        /* Style untuk H1 di dalam header */
+        .main-header h1 {
+            margin: 0; /* Hapus margin default pada H1 */
+            font-size: 1em; /* Atur ukuran font H1 agar sesuai dengan parent (main-header) */
+        }
+
+        /* Style untuk H2 dalam container */
+        .main-content-section h2 { /* Mengganti .container h2 */
+            font-family: 'Ubuntu', sans-serif;
+            color: var(--color-scheme-bg2);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        /* --- CLASS UNTUK STICKY HEADER (DITAMBAHKAN OLEH JAVASCRIPT) --- */
+        .sticky {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000; /* Z-index sangat tinggi agar selalu di atas */
+        }
+
+        /* --- IKLAN SCROLL TO CONTINUE (SEKARANG TIDAK FIXED, AKAN MENGGULIR) --- */
+        .top-scroll-ad {
+            width: 100%;
+            min-height: 60vh; /* Tinggi minimal untuk iklan desktop */
+            background: linear-gradient(to right, var(--color-scheme-bg2), var(--color-scheme-bg));
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden; /* Tambahkan ini agar konten iklan tidak meluber */
+            margin-bottom: 20px; /* Jarak antara iklan dan header/konten berikutnya */
+        }
+
+        .top-scroll-ad p {
+            margin: 0;
+            padding: 15px 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            color: var(--color-scheme-bg);
+            margin-bottom: 15px; /* Jarak antara placeholder dan iklan */
+        }
+        /* Menggunakan kelas spesifik untuk teks informasi iklan */
+        .ad-info-text-small {
+            font-size: 0.2em;
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .ad-info-text-medium {
+            font-size: 0.6em;
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+
+        /* --- Footer Styles --- */
+        .main-footer {
+            text-align: center;
+            color: white;
+            font-family: 'Ubuntu', sans-serif;
+            padding: 30px 20px;
+            margin-top: 50px;
+            width: 100%;
+            box-sizing: border-box; /* Diperbaiki dari 'border-sizing' */
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .main-footer a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s ease;
+        }
+
+        .main-footer a:hover {
+            color: #f0f0f0;
+            text-decoration: underline;
+        }
+
+        /* Style untuk ad-container agar ada jarak antar unit iklan dan tampilan yang rapi */
+        .ad-container {
+            background: var(--ad-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 3rem 0; /* Jarak atas dan bawah lebih besar */
+            text-align: center;
+            max-width: 100%; /* Pastikan tidak melebihi lebar induknya */
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .ad-container script, .ad-container ins, .ad-container div[id^="container-"] {
+            display: block; /* Memastikan elemen iklan mengambil baris baru */
+            margin: 0 auto; /* Tengah-tengah jika ukurannya lebih kecil dari ad-container */
+        }
+
+
+        /* --- Media Queries for Responsiveness --- */
+
+        /* Untuk semua layar (Desktop & Mobile) */
+        body {
+            /* padding-top akan diatur oleh JS untuk header sticky */
+            padding-bottom: 270px; /* Memberikan ruang untuk iklan fixed mobile/potrait di bagian bawah */
+        }
+        .main-content-section { /* Mengganti .container */
+            margin-top: 0; /* JS akan mengatur padding-top body */
+        }
+
+
+        /* Untuk layar dengan lebar maksimum 768px (Tablet & Mobile Landscape) */
+        @media (max-width: 768px) {
+            .main-header {
+                height: 50px;
+                font-size: 1.4em;
+            }
+            .main-header h1 {
+                font-size: 1em; /* Sesuaikan ukuran font H1 responsif */
+            }
+            .main-content-section h2 { /* Mengganti .container h2 */
+                font-size: 1.6em; /* Sesuaikan ukuran font H2 responsif */
+            }
+            .top-scroll-ad {
+                min-height: 40vh; /* Tinggi minimal untuk iklan tablet */
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+            body {
+                padding-bottom: 320px; /* Ruang lebih besar untuk iklan bawah */
+            }
+            .main-content-section { /* Mengganti .container */
+                padding: 30px;
+                width: 95%;
+            }
+
+            /* Iklan Scroll to Continue untuk Mobile */
+            .top-scroll-ad p {
+                padding: 12px 20px;
+            }
+            .ad-info-text-small {
+                font-size: 0.3em; /* Sesuaikan ukuran font untuk responsif */
+            }
+            .ad-info-text-medium {
+                font-size: 0.8em; /* Sesuaikan ukuran font untuk responsif */
+            }
+
+            /* Footer Responsive */
+            .main-footer {
+                padding: 20px 10px;
+                margin-top: 30px;
+            }
+            .main-footer a {
+                margin: 0 8px;
+                font-size: 0.9em;
+            }
+
+            /* Ad Container responsive tweaks */
+            .ad-container {
+                padding: 1rem;
+                margin: 2rem 0;
+            }
+        }
+
+        /* Untuk layar dengan lebar maksimum 480px (Mobile Portrait) */
+        @media (max-width: 480px) {
+            .main-header {
+                height: 40px;
+                font-size: 1.2em;
+            }
+            .main-header h1 {
+                font-size: 1em; /* Sesuaikan ukuran font H1 responsif */
+            }
+            .main-content-section h2 { /* Mengganti .container h2 */
+                font-size: 1.4em; /* Sesuaikan ukuran font H2 responsif */
+            }
+            .top-scroll-ad {
+                min-height: 30vh; /* Tinggi minimal untuk iklan mobile */
+                margin-bottom: 10px;
+                padding: 10px;
+            }
+            body {
+                padding-bottom: 270px;
+            }
+            .main-content-section { /* Mengganti .container */
+                padding: 20px;
+                width: 100%;
+                margin: 10px auto;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            /* Iklan Scroll to Continue untuk Mobile */
+            .top-scroll-ad p {
+                padding: 10px 15px;
+            }
+            .ad-info-text-small {
+                font-size: 0.4em; /* Sesuaikan ukuran font untuk responsif */
+            }
+            .ad-info-text-medium {
+                font-size: 1em; /* Sesuaikan ukuran font untuk responsif */
+            }
+            /* Footer Responsive */
+            .main-footer a {
+                margin: 0 5px;
+                font-size: 0.8em;
+            }
+            /* Ad Container responsive tweaks */
+            .ad-container {
+                padding: 0.8rem;
+                margin: 1.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-scroll-ad">
+        <div class="ad-info-text-small"> Iklan Sponsor - Gulir Ke Bawah!
+        </div>
+
+        <div class="ad-container">
+        	<iframe data-aa="2397571" src="//www.maba.my.id/investment-country-united-states?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+            </div>
+        <div class="ad-container">
+        	<iframe data-aa="2397572" src="//www.maba.my.id/investment-country-norway?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+        </div>
+        <div class="ad-container">
+        	<iframe data-aa="2397573" src="//www.maba.my.id/investment-country-new-zealand?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+            </div>
+        <div class="ad-container">
+        	<iframe data-aa="2397574" src="//www.maba.my.id/investment-country-australia?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+            </div>
+    </div>
+
+    <header class="main-header" id="myStickyHeader">
+        <h1 id="pageTitle">Movie Link Gallery</h1> </header>
+
+    <main class="main-content-section">
+            <h2>List of Selected Links</h2>
+            <div id="linksContainer" class="link-list-grid">
+            </div>
+    </main>
+
+    <footer class="main-footer">
+        <a href="https://www.maba.my.id">Sitemap</a> |
+        <a href="https://www.maba.my.id">Contact</a> |
+        <a href="https://www.maba.my.id">Privacy Policy</a> |
+        <a href="https://www.maba.my.id">Disclaimer</a>
+    </footer>
+
+    <div class="top-scroll-ad">
+        <div class="ad-info-text-small"> Iklan Sponsor - Gulir Ke Bawah!
+        </div>
+
+        <div class="ad-container">
+        	<iframe data-aa="2397575" src="//www.maba.my.id/investment-country-united-states?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+            </div>
+        <div class="ad-container">
+        	<iframe data-aa="2397576" src="//www.maba.my.id/investment-country-norway?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+        </div>
+        <div class="ad-container">
+        	<iframe data-aa="2397577" src="//www.maba.my.id/investment-country-new-zealand?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+            </div>
+        <div class="ad-container">
+        	<iframe data-aa="2397578" src="//www.maba.my.id/investment-country-australia?size=300x400&background_color=FFFFFF&title_color=333333&title_hover_color=0056b3&link_color=007bff&link_hover_color=0056b3" style="width:300px; height:400px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe>
+            </div>
+    </div>
+
+    <script>
+        // Data URL movie Anda. Ganti dengan URL video langsung Anda!
+        const links = [ // Changed from 'movies' to 'links'
+     "https://videy.co/v?id=ec3oyDiF1",
+"https://videy.co/v?id=EO82ga3h1",
+"https://videy.co/v?id=yDFtLesz1",
+"https://videy.co/v?id=PXwMAPPc1",
+"https://videy.co/v?id=QkReCxs71",
+"https://videy.co/v?id=IKQRmm3J1",
+"https://videy.co/v?id=hQURXOko1",
+"https://videy.co/v?id=7rlQWItc1",
+"https://videy.co/v?id=Xl1KOhqm1",
+"https://videy.co/v?id=QjKO8zNf1",
+"https://videy.co/v?id=neL89N7p1",
+"https://videy.co/v?id=sXExUvm81",
+"https://videy.co/v?id=0fXKXLcl1",
+"https://videy.co/v?id=9XSxPeIa1",
+"https://videy.co/v?id=8Tfr2AJx1",
+"https://videy.co/v?id=419tmImN1",
+"https://videy.co/v?id=WakWir1c1",
+"https://videy.co/v?id=xYGOD48T1",
+"https://videy.co/v?id=S5Tw1MK01",
+"https://videy.co/v?id=HRLeeEGp1",
+"https://videy.co/v?id=VoxkjcFs1",
+"https://videy.co/v?id=NBgQSJ5L1",
+"https://videy.co/v?id=rPLTcN5n1",
+"https://videy.co/v?id=tbtXs6za1",
+"https://videy.co/v?id=sprBYHMR1",
+"https://videy.co/v?id=LOHOYV4h1",
+"https://videy.co/v?id=R8udqWgT1",
+"https://videy.co/v?id=NaH95GGT1",
+"https://videy.co/v?id=VmA2XnLP1",
+"https://videy.co/v?id=VojLbH3n1",
+"https://videy.co/v?id=PLsgtClB1",
+"https://videy.co/v?id=Er8IDTTY1",
+"https://videy.co/v?id=Rv5TPSF31",
+"https://videy.co/v?id=QLTOYXqn1",
+"https://videy.co/v?id=ZStJXA3i1",
+"https://videy.co/v?id=IBZl42KF1",
+"https://videy.co/v?id=6S6XyHIT1",
+"https://videy.co/v?id=EGKmje6t1",
+"https://videy.co/v?id=Aky8MK0G1",
+"https://videy.co/v?id=u5634jXi1",
+"https://videy.co/v?id=PjipvYjs1",
+"https://videy.co/v?id=qGrmHC4k1",
+"https://videy.co/v?id=lDneKwHL1",
+"https://videy.co/v?id=D0sIQWMy1",
+"https://videy.co/v?id=6I4AajFC1",
+"https://videy.co/v?id=nSYnmmIR1",
+"https://videy.co/v?id=T7qqfGTR1",
+"https://videy.co/v?id=Arxt9BoL1",
+"https://videy.co/v?id=3nE2WEyz1",
+"https://videy.co/v?id=Yv1PntDs1",
+"https://videy.co/v?id=T1nMS9611",
+"https://videy.co/v?id=Nr8sPk9M1",
+"https://videy.co/v?id=a6rM90G11",
+"https://videy.co/v?id=tTjv9APe1",
+"https://videy.co/v?id=HEWQvfR61",
+"https://videy.co/v?id=YwuMvsY71",
+"https://videy.co/v?id=ZfszHWHp1",
+"https://videy.co/v?id=lykrhBJL1",
+"https://videy.co/v?id=B7P8IQ8a1",
+"https://videy.co/v?id=lOLziIpe1",
+"https://videy.co/v?id=IbWVfG5e1",
+"https://videy.co/v?id=VvuVETsu1",
+"https://videy.co/v?id=sgVYoROB1",
+"https://videy.co/v?id=TzRs2Ery1",
+"https://videy.co/v?id=z36LBgca1",
+"https://videy.co/v?id=488iI1Ce1",
+"https://videy.co/v?id=8duc3X2Y1",
+"https://videy.co/v?id=I0xmLOS91",
+"https://videy.co/v?id=BHXsrywt1",
+"https://videy.co/v?id=U3hrjnjN1",
+"https://videy.co/v?id=8jxh4JsG1",
+"https://videy.co/v?id=o4f8edBZ1",
+"https://videy.co/v?id=3uqnETaR1",
+"https://videy.co/v?id=solmuPip1",
+"https://videy.co/v?id=7VwFrhCf1",
+"https://videy.co/v?id=D6ct5I4W1",
+"https://videy.co/v?id=HivjbYkC1",
+"https://videy.co/v?id=Kb7vcThi1",
+"https://videy.co/v?id=V05seEPL1",
+"https://videy.co/v?id=5p4pO09P",
+"https://videy.co/v?id=rjPKviFt1",
+"https://videy.co/v?id=va823Kql1",
+"https://videy.co/v?id=lwUPcgzj1",
+"https://videy.co/v?id=QaHoTe1W1",
+"https://videy.co/v?id=1CM8a7KV1",
+"https://videy.co/v?id=PazNKoRb1",
+"https://videy.co/v?id=h89R8IQ91",
+"https://videy.co/v?id=Aj5Ub7Tv1",
+"https://videy.co/v?id=9C4N0M6r1",
+"https://videy.co/v?id=xyHm43P81",
+"https://videy.co/v?id=z6rCjPUE1",
+"https://videy.co/v?id=LdOzXnXP1",
+"https://videy.co/v?id=akFjbvRU1",
+"https://videy.co/v?id=uqzyAw5e1",
+"https://videy.co/v?id=aHJZ6P3h1",
+"https://videy.co/v?id=xVYbD3iI1",
+"https://videy.co/v?id=mlSQ3Sum1",
+"https://videy.co/v?id=Lcj5NNz41",
+"https://videy.co/v?id=zSnx4JBd1",
+"https://videy.co/v?id=6DX8W6JD1",
+"https://videy.co/v?id=bx87nWAf1",
+"https://videy.co/v?id=wytOZlYg1",
+"https://videy.co/v?id=n2dPZdAs1",
+"https://videy.co/v?id=2yFjuaFp",
+"https://videy.co/v?id=22ofM9f71",
+"https://videy.co/v?id=kHRwzeM81",
+"https://videy.co/v?id=0XawyPC11",
+"https://videy.co/v?id=N2dRW4z91",
+"https://videy.co/v?id=RbvBiAUF1",
+"https://videy.co/v?id=nxkWOzw01",
+"https://videy.co/v?id=uGaj3XBO1",
+"https://videy.co/v?id=aPCIz0LM1",
+"https://videy.co/v?id=TJDBXQ7z1",
+"https://videy.co/v?id=tX3I3yXV1",
+"https://videy.co/v?id=y4dOXFbf1",
+"https://videy.co/v?id=MtQu6nFO",
+"https://videy.co/v?id=tmw2ISvU1",
+"https://videy.co/v?id=Qjkwyesk1",
+"https://videy.co/v?id=RV8eG9uw1",
+"https://videy.co/v?id=245HQ90K1",
+"https://videy.co/v?id=AnQRWver1",
+"https://videy.co/v?id=MtbQC4lt",
+"https://videy.co/v?id=PKe3lfPw1",
+"https://videy.co/v?id=CcEOCbdQ1",
+"https://videy.co/v?id=pBBgOImP1",
+"https://videy.co/v?id=sMt1WaBk1",
+"https://videy.co/v?id=K7sbmihK1",
+"https://videy.co/v?id=PfwtMSyG1",
+"https://videy.co/v?id=M4pHIWLC1",
+"https://videy.co/v?id=d8nriDZN1",
+"https://videy.co/v?id=Movj0zio1",
+"https://videy.co/v?id=Q2LyqVSS1",
+"https://videy.co/v?id=UOykvcM11",
+"https://videy.co/v?id=k9tbIB4x1",
+"https://videy.co/v?id=6jxe7YZ41",
+"https://videy.co/v?id=bT9jnK5B1",
+"https://videy.co/v?id=XroZQJSO1",
+"https://videy.co/v?id=2MEYkK5o1",
+"https://videy.co/v?id=bMLqUoE21",
+"https://videy.co/v?id=RKpWMBEo1",
+"https://videy.co/v?id=vTxioM7m1",
+"https://videy.co/v?id=kUqJ0K1V1",
+"https://videy.co/v?id=otXxIzzU1",
+"https://videy.co/v?id=lz0D43s41",
+"https://videy.co/v?id=uSjv4QPj1",
+"https://videy.co/v?id=QqCHVKQK1",
+"https://videy.co/v?id=xTm1D8uw1",
+"https://videy.co/v?id=401dRIMl1",
+"https://videy.co/v?id=BJjo98TA1",
+"https://videy.co/v?id=UGExLFJZ1",
+"https://videy.co/v?id=y6tfr4ZY1",
+"https://videy.co/v?id=CkTXTXNE1",
+"https://videy.co/v?id=DMktqTNS1",
+"https://videy.co/v?id=tM78D4ah1",
+"https://videy.co/v?id=1NOfeJdP1",
+"https://videy.co/v?id=twCLd3JE1",
+"https://videy.co/v?id=IHJRJDpV1",
+"https://videy.co/v?id=Byr2uDSe1",
+"https://videy.co/v?id=P6cV1spi1",
+"https://videy.co/v?id=fkTeZkZ11",
+"https://videy.co/v?id=3j45agVQ1",
+"https://videy.co/v?id=uS27SzHW1",
+"https://videy.co/v?id=gisy4kGU1",
+"https://videy.co/v?id=XQHkV2x01",
+"https://videy.co/v?id=rmDvmHa71",
+"https://videy.co/v?id=bsmJgCUj1",
+"https://videy.co/v?id=pP16hzhq1",
+"https://videy.co/v?id=Gpfuw7Wu1",
+"https://videy.co/v?id=PQ32iXml1",
+"https://videy.co/v?id=SDYOnduK1",
+"https://videy.co/v?id=ykWds99U1",
+"https://videy.co/v?id=RdKQwvok1",
+"https://videy.co/v?id=tA3C24tA1",
+"https://videy.co/v?id=kkmlSW8w1",
+"https://videy.co/v?id=NBYMcRO31",
+"https://videy.co/v?id=iiClZdTZ1",
+"https://videy.co/v?id=O5jgnus21",
+"https://videy.co/v?id=FddfHBGR1",
+"https://videy.co/v?id=yBOBfoIG1",
+"https://videy.co/v?id=eqrIlRTU1",
+"https://videy.co/v?id=moiy9KU21",
+"https://videy.co/v?id=o1ME5T9O1",
+"https://videy.co/v?id=6C78s0HG1",
+"https://videy.co/v?id=8XHhqiOv1",
+"https://videy.co/v?id=p3fzXDFD1",
+"https://videy.co/v?id=RreE1IYi1",
+"https://videy.co/v?id=x0Q1zurH1",
+"https://videy.co/v?id=6pYPPhUc1",
+"https://videy.co/v?id=7PUtSBHQ1",
+"https://videy.co/v?id=Z8pswKNa1",
+"https://videy.co/v?id=rknYmoWh1",
+"https://videy.co/v?id=ne2Y914O1",
+"https://videy.co/v?id=UrAPzHQO1",
+"https://videy.co/v?id=rtUCe1nL1",
+"https://videy.co/v?id=4LJ0CR4f1",
+"https://videy.co/v?id=OkD3hBFW1",
+"https://videy.co/v?id=bSRwwBjA1",
+"https://videy.co/v?id=RbhL5aJJ1",
+"https://videy.co/v?id=sVq9GQCH1",
+"https://videy.co/v?id=zc4L3EZW1",
+"https://videy.co/v?id=agksfL8Q1",
+"https://videy.co/v?id=m4mxoXp71",
+"https://videy.co/v?id=tQ2IheoI1",
+"https://videy.co/v?id=s6JhoyLM1",
+"https://videy.co/v?id=S6MOVdz31",
+"https://videy.co/v?id=S0FcMPBn1",
+"https://videy.co/v?id=Pnt1gOED1",
+"https://videy.co/v?id=C07qMLTs1",
+"https://videy.co/v?id=WCcrmPBC1",
+"https://videy.co/v?id=zV6zLKus1",
+"https://videy.co/v?id=c4IJa1oM1",
+"https://videy.co/v?id=oGjVEBXx1",
+"https://videy.co/v?id=UWUwyKXv1",
+"https://videy.co/v?id=4mNaFC0n1",
+"https://videy.co/v?id=t2F2gTMz1",
+"https://videy.co/v?id=GGqtAPAm1",
+"https://videy.co/v?id=26v4A7SL1",
+"https://videy.co/v?id=CHVO08vh1",
+"https://videy.co/v?id=N8moBkdW1",
+"https://videy.co/v?id=LGMrNQE71",
+"https://videy.co/v?id=i6lCrUbn1",
+"https://videy.co/v?id=aDiEBlNT1",
+"https://videy.co/v?id=JCvAYngD1",
+"https://videy.co/v?id=y3uEJGjW1",
+"https://videy.co/v?id=tAUaMtxL1",
+"https://videy.co/v?id=7k6z0iZc1",
+"https://videy.co/v?id=OWqfScCz1",
+"https://videy.co/v?id=jDzTjioe1",
+"https://videy.co/v?id=An1ZmeLG1",
+"https://videy.co/v?id=1rq472Rc1",
+"https://videy.co/v?id=SSL1pBLx1",
+"https://videy.co/v?id=IXqbqFY61",
+"https://videy.co/v?id=OxLORg8H1",
+"https://videy.co/v?id=GFhJhJuB1",
+"https://videy.co/v?id=ofhzH5h51",
+"https://videy.co/v?id=aBva6JQY1",
+"https://videy.co/v?id=ONfb5OcY1",
+"https://videy.co/v?id=lqIobgMD1",
+"https://videy.co/v?id=cKbYlnvP1",
+"https://videy.co/v?id=1GzmTP1c1",
+"https://videy.co/v?id=CGcxfuUN1",
+"https://videy.co/v?id=4VeUxj4a1",
+"https://videy.co/v?id=OOyY3kAd1",
+"https://videy.co/v?id=cgMo9ai01",
+"https://videy.co/v?id=FF05eRl71",
+"https://videy.co/v?id=jS1Qurvu1",
+"https://videy.co/v?id=num0rbgh1",
+"https://videy.co/v?id=CDmrloeD1",
+"https://videy.co/v?id=yOe5oHFA1",
+"https://videy.co/v?id=kFhXijCj1",
+"https://videy.co/v?id=Aws8Botv1",
+"https://videy.co/v?id=qqUkcYUp1",
+"https://videy.co/v?id=Q0PEBSOr1",
+"https://videy.co/v?id=FzS6nAn21",
+"https://videy.co/v?id=Ia9Chb761",
+"https://videy.co/v?id=ktobvjzE1",
+"https://videy.co/v?id=AhLZAXGV1",
+"https://videy.co/v?id=pcJBfrRs1",
+"https://videy.co/v?id=Y84wDHr61",
+"https://videy.co/v?id=H9Il14cE1",
+"https://videy.co/v?id=YPD3hXwM1",
+"https://videy.co/v?id=7BZ9GlYi1",
+"https://videy.co/v?id=eAZQVSJt1",
+"https://videy.co/v?id=nOriC9Qg1",
+"https://videy.co/v?id=uYojV2xc1",
+"https://videy.co/v?id=2m64emHe1",
+"https://videy.co/v?id=qFNNxjz71",
+"https://videy.co/v?id=DdcfsgQ71",
+"https://videy.co/v?id=p9SibFvj1",
+"https://videy.co/v?id=HaLZBPoz1",
+"https://videy.co/v?id=AksvdgAQ1",
+"https://videy.co/v?id=eG8fpss21",
+"https://videy.co/v?id=oHBjZ5ea1",
+"https://videy.co/v?id=uqH63P9W1",
+"https://videy.co/v?id=phwuI7gr1",
+"https://videy.co/v?id=AYfaOZcp1",
+"https://videy.co/v?id=gTZNEn151",
+"https://videy.co/v?id=0c1CPpA51",
+"https://videy.co/v?id=FXlpiV0f1",
+"https://videy.co/v?id=b0MwhTJS1",
+"https://videy.co/v?id=IlSh4TA91",
+"https://videy.co/v?id=CsIgAa8C1",
+"https://videy.co/v?id=7DJA01pz1",
+"https://videy.co/v?id=z0st1Xpb1",
+"https://videy.co/v?id=4FuHYrxn1",
+"https://videy.co/v?id=JCeb1LoP1",
+"https://videy.co/v?id=ILnDvMrW1",
+"https://videy.co/v?id=RDPbG5mN1",
+"https://videy.co/v?id=fjTxj30C1",
+"https://videy.co/v?id=Q2wSlabZ1",
+"https://videy.co/v?id=oodnMvi41",
+"https://videy.co/v?id=Gl4OWZ3x1",
+"https://videy.co/v?id=Aa1Nl9PG1",
+"https://videy.co/v?id=ZAQk2q8h1",
+"https://videy.co/v?id=MPzFp2aP1",
+"https://videy.co/v?id=X6J30sqV1",
+"https://videy.co/v?id=rMxIk4Ii1",
+"https://videy.co/v?id=f20Szhh41",
+"https://videy.co/v?id=yPLyXqOy1",
+"https://videy.co/v?id=C0zJEATV1",
+"https://videy.co/v?id=IqjgiH2g1",
+"https://videy.co/v?id=P7gR8Te61",
+"https://videy.co/v?id=QhM8rfpc1",
+"https://videy.co/v?id=2ZcIBddT1",
+"https://videy.co/v?id=MLJgsy8B1",
+"https://videy.co/v?id=DCkuK9HA1",
+"https://videy.co/v?id=e98Zbwrr1",
+"https://videy.co/v?id=bVgjyI2H1",
+"https://videy.co/v?id=X6SR86wc1",
+"https://videy.co/v?id=Q9brXHfO1",
+"https://videy.co/v?id=RSWQij5I1",
+"https://videy.co/v?id=P7dKvqf11",
+"https://videy.co/v?id=q1LCP67l1",
+"https://videy.co/v?id=GXlypwEw1",
+"https://videy.co/v?id=gx5Cigww1",
+"https://videy.co/v?id=1SxTAZFn1",
+"https://videy.co/v?id=aqo6CpF01",
+"https://videy.co/v?id=STVYjS1w1",
+"https://videy.co/v?id=leW357FE1",
+"https://videy.co/v?id=eWqw9R4d1",
+"https://videy.co/v?id=92ilxKcx1",
+"https://videy.co/v?id=WcwDNRAO1",
+"https://videy.co/v?id=pZoEA4V81",
+"https://videy.co/v?id=vUhzKJPU1",
+"https://videy.co/v?id=ibaeCUyN1",
+"https://videy.co/v?id=00XbVSZT1",
+"https://videy.co/v?id=YdNanVjd1",
+"https://videy.co/v?id=52s2hdhQ1",
+"https://videy.co/v?id=imewtkXh1",
+"https://videy.co/v?id=RoQihEFC1",
+"https://videy.co/v?id=yaM7jWfd1",
+"https://videy.co/v?id=FdvSEupf1",
+"https://videy.co/v?id=PAPx8LTl1",
+"https://videy.co/v?id=DSZ1Hbwx1",
+"https://videy.co/v?id=jxSn0VOv1",
+"https://videy.co/v?id=FvfNTJXd1",
+"https://videy.co/v?id=LznId54V1",
+"https://videy.co/v?id=wU8B5dKz1",
+"https://videy.co/v?id=pMshSDSo1",
+"https://videy.co/v?id=Br6mSBce1",
+"https://videy.co/v?id=cZon9BQv1",
+"https://videy.co/v?id=PcKXksyG1",
+"https://videy.co/v?id=hPiB3qyU1",
+"https://videy.co/v?id=4ciHDlle1",
+"https://videy.co/v?id=g1j982dp1",
+"https://videy.co/v?id=jKO2fA9S1",
+"https://videy.co/v?id=W1px2xlW1",
+"https://videy.co/v?id=0UtgcAWg1",
+"https://videy.co/v?id=LQDmtFNR1",
+"https://videy.co/v?id=gqHkA6Ps1",
+"https://videy.co/v?id=VkBx3Z4f1",
+"https://videy.co/v?id=NPDbwYra1",
+"https://videy.co/v?id=OwnZGD6J1",
+"https://videy.co/v?id=RTmepxwJ1",
+"https://videy.co/v?id=7zOVrrRZ1t",
+"https://videy.co/v?id=lwi1GDay1",
+"https://videy.co/v?id=1W0AnECh1",
+"https://videy.co/v?id=Y0EudUNv1",
+"https://videy.co/v?id=oHBJmFiR1",
+"https://videy.co/v?id=a2AaBuoj1",
+"https://videy.co/v?id=ZOBNuGXl1",
+"https://videy.co/v?id=NKhMufxZ1",
+"https://videy.co/v?id=zCf0Qh861",
+"https://videy.co/v?id=trqbfc961",
+"https://videy.co/v?id=IsDQ2s2Y1",
+"https://videy.co/v?id=RgpUgnVm1",
+"https://videy.co/v?id=DQb17gQm1",
+"https://videy.co/v?id=899BGbzY1",
+"https://videy.co/v?id=nUhskOSA1",
+"https://videy.co/v?id=ne8LaUX11",
+"https://videy.co/v?id=CRojSfUT1",
+"https://videy.co/v?id=G4LvKZqv1",
+"https://videy.co/v?id=YIrT4bQp1",
+"https://videy.co/v?id=r5SvXQqf1",
+"https://videy.co/v?id=P2KLHjuT1",
+"https://videy.co/v?id=ablT03c81",
+"https://videy.co/v?id=oofvex451",
+"https://videy.co/v?id=FccxI6YD1",
+"https://videy.co/v?id=x0gJdSgM1",
+"https://videy.co/v?id=88l3DlKv1",
+"https://videy.co/v?id=stSbM9k61",
+"https://videy.co/v?id=Zraasm5L1",
+"https://videy.co/v?id=jppyozN11",
+"https://videy.co/v?id=EjUjD23h1",
+"https://videy.co/v?id=lqk5E2Ca1",
+"https://videy.co/v?id=MzhyaR5V1",
+"https://videy.co/v?id=iRTA0Axi1",
+"https://videy.co/v?id=PiiETXpQ1",
+"https://videy.co/v?id=RPFLVqdo1",
+"https://videy.co/v?id=9ESSwSZL1",
+"https://videy.co/v?id=RLOi8TzJ1",
+"https://videy.co/v?id=yQ3EqBdx1",
+"https://videy.co/v?id=88w2EnLb1",
+"https://videy.co/v?id=QkUprhaz1",
+"https://videy.co/v?id=0WRpJpYf1",
+"https://videy.co/v?id=OxW7QSBu1",
+"https://videy.co/v?id=KM49w33T1",
+"https://videy.co/v?id=UzH6V69F1",
+"https://videy.co/v?id=BQLpZflP1",
+"https://videy.co/v?id=X0UWHnd31",
+"https://videy.co/v?id=m9IcSPEw1",
+"https://videy.co/v?id=bWAaG2TE1",
+"https://videy.co/v?id=5Y1GCThq1",
+"https://videy.co/v?id=XdyvrMRA1",
+"https://videy.co/v?id=mtqWzwzO1",
+"https://videy.co/v?id=CeD82opj1",
+"https://videy.co/v?id=PMHWU0vZ1",
+"https://videy.co/v?id=IBKLJW8f1",
+"https://videy.co/v?id=hLl3wYdx1",
+"https://videy.co/v?id=h7SCtRdO1",
+"https://videy.co/v?id=9L75Qw801",
+"https://videy.co/v?id=Q0HCSl6P1",
+"https://videy.co/v?id=ilXBeX961",
+"https://videy.co/v?id=Yao10Qp61",
+"https://videy.co/v?id=XvtnHYtZ1",
+"https://videy.co/v?id=0K0rZ5Nf1",
+"https://videy.co/v?id=gxRULCYX1",
+"https://videy.co/v?id=2AfClT2S1",
+"https://videy.co/v?id=r1RQLVsZ1",
+"https://videy.co/v?id=60RiqqAk1",
+"https://videy.co/v?id=fafHHf7T1",
+"https://videy.co/v?id=K7zXUHZC1",
+"https://videy.co/v?id=bm7EtKo51",
+"https://videy.co/v?id=vih7oyft1",
+"https://videy.co/v?id=oguhYYW31",
+"https://videy.co/v?id=uC7ORt1q1",
+"https://videy.co/v?id=iBpQFVcs1",
+"https://videy.co/v?id=DROYJsic1",
+"https://videy.co/v?id=NGkOXZEm1",
+"https://videy.co/v?id=DL9L9pdl1",
+"https://videy.co/v?id=Jwhc9eAz1",
+"https://videy.co/v?id=eZ8PZ31z1",
+"https://videy.co/v?id=FkSAao3J1",
+"https://videy.co/v?id=JYGpPZXR1",
+"https://videy.co/v?id=nqRmVyPi1",
+"https://videy.co/v?id=1wJCxD8B1",
+"https://videy.co/v?id=CuddfFnN1",
+"https://videy.co/v?id=2zoIQGrK1",
+"https://videy.co/v?id=pdJEsgOC1",
+"https://videy.co/v?id=LXrt3Wyx1",
+"https://videy.co/v?id=9HiTqML11",
+"https://videy.co/v?id=FbZbpFtk1",
+"https://videy.co/v?id=iGZDKS6J1",
+"https://videy.co/v?id=goAAJjUF1",
+"https://videy.co/v?id=LQNJOZRr1",
+"https://videy.co/v?id=9cbwAYd51",
+"https://videy.co/v?id=7MMO1XJH1",
+"https://videy.co/v?id=zX4C6arI1",
+"https://videy.co/v?id=2st6nRdw1",
+"https://videy.co/v?id=wv28QMSx1",
+"https://videy.co/v?id=cxaF3qq01",
+"https://videy.co/v?id=SOpWfAiI1",
+"https://videy.co/v?id=XNMUTWWn1",
+"https://videy.co/v?id=wEvTLU9v1",
+"https://videy.co/v?id=DaQ352my1",
+"https://videy.co/v?id=OcN86mbh1",
+"https://videy.co/v?id=5tV9CQVM1",
+"https://videy.co/v?id=tBdsQH121",
+"https://videy.co/v?id=zuVtGIMV1",
+"https://videy.co/v?id=uJEq0tcS1",
+"https://videy.co/v?id=SywmuKX41",
+"https://videy.co/v?id=wY9rakCl1",
+"https://videy.co/v?id=wbBv2Xfz1",
+"https://videy.co/v?id=y67A7k4i1",
+"https://videy.co/v?id=24VM6hBo1",
+"https://videy.co/v?id=cCmh9U6j1",
+"https://videy.co/v?id=sg3YnMmz1",
+"https://videy.co/v?id=3Ms6GmtB1",
+"https://videy.co/v?id=rYavWZjJ1",
+"https://videy.co/v?id=FsfyWbvI1",
+"https://videy.co/v?id=oKsucJxi1",
+"https://videy.co/v?id=pQgUFzmK1",
+"https://videy.co/v?id=oJKVjoUj1",
+"https://videy.co/v?id=MyzmFAtS1",
+"https://videy.co/v?id=TRU85rqs1",
+"https://videy.co/v?id=XcuohFpm1",
+"https://videy.co/v?id=9PIGKE2a1",
+"https://videy.co/v?id=9lL6Q0591",
+"https://videy.co/v?id=ck9XWk351",
+"https://videy.co/v?id=avr8Pdpj1",
+"https://videy.co/v?id=VV6kQQLx1",
+"https://videy.co/v?id=rG9YdoZ51",
+"https://videy.co/v?id=GGuLdakf1",
+"https://videy.co/v?id=BBpdZpp61",
+"https://videy.co/v?id=AvXd5AM51",
+"https://videy.co/v?id=r7qbQaNS1",
+"https://videy.co/v?id=nQlDGYpy1",
+"https://videy.co/v?id=FFpEiapa1",
+"https://videy.co/v?id=a4dZj3k51",
+"https://videy.co/v?id=wC7PemNO1",
+"https://videy.co/v?id=3V8thpGb1",
+"https://videy.co/v?id=FJbWvIKw1",
+"https://videy.co/v?id=2lIsy4oP1",
+"https://videy.co/v?id=sTbGuzg71",
+"https://videy.co/v?id=Z8xokKhD1",
+"https://videy.co/v?id=gcaZtG2I1",
+"https://videy.co/v?id=kA48Lxuf1",
+"https://videy.co/v?id=zIHszcgc1",
+"https://videy.co/v?id=tUhTbtn91",
+"https://videy.co/v?id=6H2bZK2p1",
+"https://videy.co/v?id=h1CuG73X1",
+"https://videy.co/v?id=4SYQp8cN1",
+"https://videy.co/v?id=8GUmoBTB1",
+"https://videy.co/v?id=T2RjnQhc1",
+"https://videy.co/v?id=QwCbUmlP1",
+"https://videy.co/v?id=tBdp6B3P1",
+"https://videy.co/v?id=MkHmIiXz1",
+"https://videy.co/v?id=E1BUYoS61",
+"https://videy.co/v?id=nudTNUFb1",
+"https://videy.co/v?id=Q6u9UHBD1",
+"https://videy.co/v?id=PuyroMbo1",
+"https://videy.co/v?id=yXGukcMu1",
+"https://videy.co/v?id=QSyhVckn1",
+"https://videy.co/v?id=oLME4gao1",
+"https://videy.co/v?id=pVGIWTts1",
+"https://videy.co/v?id=l3LwOy7r1",
+"https://videy.co/v?id=smMnJo6V1",
+"https://videy.co/v?id=bP4FzsHe1",
+"https://videy.co/v?id=CWm2QkDl1",
+"https://videy.co/v?id=5aAjHeKY1",
+"https://videy.co/v?id=8wTMGr4t1",
+"https://videy.co/v?id=UiZnQOfC1",
+"https://videy.co/v?id=qkRkDM9T1",
+"https://videy.co/v?id=i1d9t60H1",
+"https://videy.co/v?id=7ahPxXzW1",
+"https://videy.co/v?id=ayCPTUtd1",
+"https://videy.co/v?id=H2nxivov1",
+"https://videy.co/v?id=SLEtNNV51",
+"https://videy.co/v?id=FW4EbDE71",
+"https://videy.co/v?id=9h9tbVEI1",
+"https://videy.co/v?id=BeJyQtTD1",
+"https://videy.co/v?id=8kxddTP21",
+"https://videy.co/v?id=VgvnWIrf1",
+"https://videy.co/v?id=98fhPg9Q1",
+"https://videy.co/v?id=4KrULE931",
+"https://videy.co/v?id=9XID1SpR1",
+"https://videy.co/v?id=zZKNPScN1",
+"https://videy.co/v?id=BTe1ESaq1",
+"https://videy.co/v?id=VayHH7rz1",
+"https://videy.co/v?id=DI9pMdX41",
+"https://videy.co/v?id=Weo8hN5H1",
+"https://videy.co/v?id=JO7PoQG01",
+"https://videy.co/v?id=Zx3qIiJI1",
+"https://videy.co/v?id=BHb3lIQq1",
+"https://videy.co/v?id=e6KpAnMp1",
+"https://videy.co/v?id=DRICjDdj1",
+"https://videy.co/v?id=KKU2XZPs1",
+"https://videy.co/v?id=FdtF4eK41",
+"https://videy.co/v?id=I1Gs2BZ81",
+"https://videy.co/v?id=eF320XbV1",
+"https://videy.co/v?id=KfsdWeS61",
+"https://videy.co/v?id=wVQ308TR1",
+"https://videy.co/v?id=qynFYdl41",
+"https://videy.co/v?id=MClUar4Y1",
+"https://videy.co/v?id=3YvulNVy1",
+"https://videy.co/v?id=n3jI0Xaw1",
+"https://videy.co/v?id=kqRWCCA11",
+"https://videy.co/v?id=XB7jHEZe1",
+"https://videy.co/v?id=dXXFszMS1",
+"https://videy.co/v?id=re3qEMnL1",
+"https://videy.co/v?id=uKPGrsbY1",
+"https://videy.co/v?id=gi3MdqL71",
+"https://videy.co/v?id=LhEGEv2Y1",
+"https://videy.co/v?id=BJDJS6zb1",
+"https://videy.co/v?id=wWtKn6UT1",
+"https://videy.co/v?id=d24fNZrf1",
+"https://videy.co/v?id=NK4GYapw1",
+"https://videy.co/v?id=FnjwK06O1",
+"https://videy.co/v?id=xTIcHkst1",
+"https://videy.co/v?id=kJOp26O91",
+"https://videy.co/v?id=RWgyI2f21",
+"https://videy.co/v?id=YtC5JkAH1",
+"https://videy.co/v?id=UhNXIdJ0",
+"https://videy.co/v?id=gt4d5L3X1",
+"https://videy.co/v?id=cu2QxJEZ1",
+"https://videy.co/v?id=vTteSWd61",
+"https://videy.co/v?id=7nNdCmUZ1",
+"https://videy.co/v?id=gX699BSr1",
+"https://videy.co/v?id=zAEYwy3g1",
+"https://videy.co/v?id=AFFLUZiC1",
+"https://videy.co/v?id=DG97JvVp1",
+"https://videy.co/v?id=SUlOg1w51",
+"https://videy.co/v?id=q2Iy1ng41",
+"https://videy.co/v?id=U9fwsrWN1",
+"https://videy.co/v?id=pcEK2JHl1",
+"https://videy.co/v?id=nzIoCYjl1",
+"https://videy.co/v?id=oLS1tL6R1",
+"https://videy.co/v?id=GaWF8vWh1",
+"https://videy.co/v?id=pXeoPzI31",
+"https://videy.co/v?id=S7CAwMuU1",
+"https://videy.co/v?id=nptNvfMD1",
+"https://videy.co/v?id=TbjV73291",
+"https://videy.co/v?id=XOlI6isC1",
+"https://videy.co/v?id=T5atQm3Q1",
+"https://videy.co/v?id=eH81Yxy41",
+"https://videy.co/v?id=yZmd3stM1",
+"https://videy.co/v?id=bVO8cjEI1",
+"https://videy.co/v?id=216dRRpD1",
+"https://videy.co/v?id=lmLcAdKb1",
+"https://videy.co/v?id=IWwDnodK1",
+"https://videy.co/v?id=mhM0j5yM1",
+"https://videy.co/v?id=TgQkW0Ff1",
+"https://videy.co/v?id=ZJcUKi1q1",
+"https://videy.co/v?id=P9o1KsmA1",
+"https://videy.co/v?id=jPhDpfpm1",
+"https://videy.co/v?id=MF16Sqod1",
+"https://videy.co/v?id=ZsxDMhJ51",
+"https://videy.co/v?id=DcIEfllY1",
+"https://videy.co/v?id=7gEKppMN1",
+"https://videy.co/v?id=kaYlztcl1",
+"https://videy.co/v?id=9lSxJmCQ1",
+"https://videy.co/v?id=6q4UWR7Y1",
+"https://videy.co/v?id=qO9MIZlW1",
+"https://videy.co/v?id=A4QiiaRd1",
+"https://videy.co/v?id=LwlCidGk1",
+"https://videy.co/v?id=nQLocUy81",
+"https://videy.co/v?id=bgoDBBy7",
+"https://videy.co/v?id=LCKDkfwV1",
+"https://videy.co/v?id=pmvlpCeB1",
+"https://videy.co/v?id=4VQTlTJh1",
+"https://videy.co/v?id=qxPww0lM1",
+"https://videy.co/v?id=cTqT2v9w1",
+"https://videy.co/v?id=VzqzNKpS1",
+"https://videy.co/v?id=se6YcHUS1",
+"https://videy.co/v?id=E95Dt2vd1",
+"https://videy.co/v?id=vEK02x5r",
+"https://videy.co/v?id=hLuNRV9W",
+"https://videy.co/v?id=NSL6F8vX1",
+"https://videy.co/v?id=do2NZKDw1",
+"https://videy.co/v?id=ahqKj3xx1",
+"https://videy.co/v?id=KCMa1wsW1",
+"https://videy.co/v?id=BWez5Jin1",
+"https://videy.co/v?id=zCz2e34f1",
+"https://videy.co/v?id=U2uKkLub1",
+"https://videy.co/v?id=EB3Z1I6n1",
+"https://videy.co/v?id=uinTDQAM1",
+"https://videy.co/v?id=x9bP5waY1",
+"https://videy.co/v?id=sNDAWBnU1",
+"https://videy.co/v?id=8VZvQeNW1",
+"https://videy.co/v?id=8xZ9hmst1",
+"https://videy.co/v?id=LoovAJhQ1",
+"https://videy.co/v?id=rUq7aHsk1",
+"https://videy.co/v?id=MUPr8NKr1",
+"https://videy.co/v?id=15P1GBnM1",
+"https://videy.co/v?id=IASqjO0C1",
+"https://videy.co/v?id=LfFXR7gG1",
+"https://videy.co/v?id=VrI8avdS1",
+"https://videy.co/v?id=xgFwaFmf1",
+"https://videy.co/v?id=ZlUqbY1D1",
+"https://videy.co/v?id=Q854s3Nq1",
+"https://videy.co/v?id=bJ7n4FrA1",
+"https://videy.co/v?id=HpDDYizh1",
+"https://videy.co/v?id=vzlKtXKQ1",
+"https://videy.co/v?id=yf5khRn41",
+"https://videy.co/v?id=CLdrUd0B1",
+"https://videy.co/v?id=ubwYVKC71",
+"https://videy.co/v?id=GEeTdLXu1",
+"https://videy.co/v?id=6FjEzShi1",
+"https://videy.co/v?id=jfuA3b5l1",
+"https://videy.co/v?id=Bum9y2vC1",
+"https://videy.co/v?id=qNqlYmco1",
+"https://videy.co/v?id=VwrZwfZ91",
+"https://videy.co/v?id=1BANVBHI1",
+"https://videy.co/v?id=JzxYEgfd1",
+"https://videy.co/v?id=oCcXdR991",
+"https://videy.co/v?id=Xx2TeyIK1",
+"https://videy.co/v?id=GOG7Cxm61",
+"https://videy.co/v?id=0Uexeouc1",
+"https://videy.co/v?id=PjMS2bvB1",
+"https://videy.co/v?id=FPIHjktr1",
+"https://videy.co/v?id=7oVOKOnU1",
+"https://videy.co/v?id=mpZgtX0S1",
+"https://videy.co/v?id=0LFLv0fO1",
+"https://videy.co/v?id=vnC5HozQ1",
+"https://videy.co/v?id=mMwGFqi71",
+"https://videy.co/v?id=nvh21jWZ1",
+"https://videy.co/v?id=Ie4jIjwe1",
+"https://videy.co/v?id=0ZnFkGbx1",
+"https://videy.co/v?id=82eGFkfo1",
+"https://videy.co/v?id=nVZ0s1201",
+"https://videy.co/v?id=TUxXXhfP1",
+"https://videy.co/v?id=oANdwPSP1",
+"https://videy.co/v?id=MFvDnroa1",
+"https://videy.co/v?id=BNaICeOF1",
+"https://videy.co/v?id=7ACnQQEt1",
+"https://videy.co/v?id=sIv0fZnJ1",
+"https://videy.co/v?id=eUWoyWh71",
+"https://videy.co/v?id=pa6FlxZw1",
+"https://videy.co/v?id=xfKGzxc41",
+"https://videy.co/v?id=WiHHbFGp1",
+"https://videy.co/v?id=UPw4WzW2",
+"https://videy.co/v?id=BxYxuedh1",
+"https://videy.co/v?id=n9L2Emde1",
+"https://videy.co/v?id=mmywM2oD1",
+"https://videy.co/v?id=fUWCb77I1",
+"https://videy.co/v?id=VFAeG62k1",
+"https://videy.co/v?id=yqdQollD1",
+"https://videy.co/v?id=Kzl7Puc51",
+"https://videy.co/v?id=EiPsky0a1",
+"https://videy.co/v?id=rmcQXJoN1",
+"https://videy.co/v?id=z68eL4XO1",
+"https://videy.co/v?id=JnvMKf5l1",
+"https://videy.co/v?id=Yz48lyHU1",
+"https://videy.co/v?id=nS49dhFp1",
+"https://videy.co/v?id=iHaEyV401",
+"https://videy.co/v?id=QwDCdgFz1",
+"https://videy.co/v?id=RuaeAoZZ1",
+"https://videy.co/v?id=qhop03Jm1",
+"https://videy.co/v?id=ftplbq1T1",
+"https://videy.co/v?id=kum2tXPE1",
+"https://videy.co/v?id=ElGKUAhZ1",
+"https://videy.co/v?id=kkddBAoc1",
+"https://videy.co/v?id=TDH2E2Fh1",
+"https://videy.co/v?id=zhXF9GxV1",
+"https://videy.co/v?id=H5wkAxFy1",
+"https://videy.co/v?id=0V4nZMvF1",
+"https://videy.co/v?id=K0OgsYNL1",
+"https://videy.co/v?id=oabezRNn1",
+"https://videy.co/v?id=Xg547NfJ1",
+"https://videy.co/v?id=SvWkEvfg1",
+"https://videy.co/v?id=WKFIkDuh1",
+"https://videy.co/v?id=BnqDo4Sg1",
+"https://videy.co/v?id=2vl7wpCx1",
+"https://videy.co/v?id=70qabDg11",
+"https://videy.co/v?id=h1Lgu6JK1",
+"https://videy.co/v?id=EIoJqu6J1",
+"https://videy.co/v?id=LVcXMx3v1",
+"https://videy.co/v?id=nUPJ1ED91",
+"https://videy.co/v?id=8Va9gJ1J1",
+"https://videy.co/v?id=hmQ1H2if1",
+"https://videy.co/v?id=JyfV6qNf1",
+"https://videy.co/v?id=fPneRmmG1",
+"https://videy.co/v?id=k2cOHBla1",
+"https://videy.co/v?id=qRMXWhl21",
+"https://videy.co/v?id=ZiCoCxDH1"       
+            // Tambahkan URL video langsung Anda di sini.
+            // Pastikan URL video tersebut dapat diakses publik dan merupakan file video (misalnya .mp4)
+        ];
+
+        const linksContainer = document.getElementById('linksContainer'); // Changed from 'movieList'
+
+        // Fungsi untuk mendapatkan daftar link yang sudah ditonton dari localStorage
+        function getWatchedLinks() { // Changed from 'getWatchedMovies'
+            const watched = localStorage.getItem('watchedLinks'); // Changed key
+            return watched ? JSON.parse(watched) : [];
+        }
+
+        // Fungsi untuk menambahkan link ke daftar yang sudah ditonton di localStorage
+        function addWatchedLink(url) { // Changed from 'addWatchedMovie'
+            const watched = getWatchedLinks(); // Uses new function
+            if (!watched.includes(url)) { // Hanya tambahkan jika belum ada
+                watched.push(url);
+                localStorage.setItem('watchedLinks', JSON.stringify(watched)); // Changed key
+            }
+        }
+
+        // Fungsi untuk menandai item link sebagai sudah ditonton (visual dan data)
+        function markLinkAsWatched(url, listItemElement) { // Changed from 'markMovieAsWatched'
+            addWatchedLink(url); // Uses new function
+            // Tambahkan kelas 'watched' ke listItem untuk perubahan gaya visual
+            listItemElement.classList.add('watched');
+        }
+
+        // Mengisi daftar link ke dalam HTML
+        links.forEach((linkUrl, index) => { // Changed from 'movies.forEach((movieUrl'
+            const listItem = document.createElement('div'); // Changed to div for grid
+            listItem.className = 'link-item'; // Changed from 'movie-item'
+
+            const anchor = document.createElement('a'); // Changed from 'link' to 'anchor' for clarity
+            anchor.className = 'actual-link'; // Changed from 'movie-link'
+            anchor.href = linkUrl;
+            anchor.target = '_blank'; // Buka di tab baru
+            anchor.rel = 'noopener noreferrer'; // Rekomendasi keamanan untuk target="_blank"
+            anchor.textContent = linkUrl;
+
+            // Tambahkan event listener untuk menandai sebagai sudah ditonton saat link diklik
+            anchor.addEventListener('click', () => {
+                markLinkAsWatched(linkUrl, listItem); // Uses new function and linkUrl
+            });
+
+            listItem.appendChild(anchor);
+            linksContainer.appendChild(listItem); // Changed from 'movieList'
+
+            // Periksa apakah link sudah ditonton sebelumnya dan tandai secara visual
+            if (getWatchedLinks().includes(linkUrl)) { // Uses new function and linkUrl
+                listItem.classList.add('watched');
+            }
+        });
+
+        // --- JavaScript untuk Sticky Header dan Tanggal Dinamis ---
+        // Kode untuk judul H1 dinamis dengan tanggal hari ini
+        const pageTitleElement = document.getElementById('pageTitle');
+        if (pageTitleElement) {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('id-ID', options); // Format tanggal untuk Indonesia (contoh: 6 Juni 2025)
+
+            // Memperbarui teks H1
+            pageTitleElement.textContent = `Daftar Link - ${formattedDate}`; // Updated text
+
+            // Perbarui juga title tag di head
+            document.title = `Daftar Link - ${formattedDate}`; // Updated text
+        }
+
+        window.onscroll = function() {myFunction()};
+
+        var header = document.getElementById("myStickyHeader");
+        var sticky = header.offsetTop; // Dapatkan posisi awal header dari atas dokumen
+
+        function myFunction() {
+          if (window.pageYOffset > sticky) {
+            // Ketika header mencapai bagian atas viewport saat di-scroll
+            header.classList.add("sticky");
+            // Tambahkan padding ke body untuk mencegah konten "loncat" ke atas
+            document.body.style.paddingTop = header.offsetHeight + "px";
+          } else {
+            // Ketika header kembali ke posisi awalnya
+            header.classList.remove("sticky");
+            // Hapus padding dari body
+            document.body.style.paddingTop = "0";
+          }
+        }
+    </script>
+</body>
+</html>
